@@ -12,14 +12,18 @@ class MyApp(App):
         input_box = BoxLayout()
         sign_box = BoxLayout()
 
-        self.result = Label(text="Result")
-        self.value_input_1 = TextInput(text="0")
-        self.value_input_2 = TextInput(text="0")
-        plus_sign = Button(text="+", on_press=self.on_click_submit_button)
-        multiply_sign = Button(text="*", on_press=self.on_click_submit_button)
+        self.result = Label(text="Result", font_size=50)
+        self.value_input_1 = TextInput(
+            text="0",
+            font_size=50,
+        )
+        self.value_input_2 = TextInput(text="0", font_size=50)
 
-        sign_box.add_widget(plus_sign)
-        sign_box.add_widget(multiply_sign)
+        for sign in ["+", "-", "*", "/"]:
+            sign_box.add_widget(
+                Button(text=sign, font_size=50, on_press=self.on_click_submit_button)
+            )
+
         input_box.add_widget(self.value_input_1)
         input_box.add_widget(self.value_input_2)
         box.add_widget(input_box)
@@ -39,6 +43,10 @@ class MyApp(App):
                 result = input_1 + input_2
             case "*":
                 result = input_1 * input_2
+            case "/":
+                result = input_1 / input_2
+            case "-":
+                result = input_1 - input_2
 
         self.result.text = f"Result: {str(result)}"
 
