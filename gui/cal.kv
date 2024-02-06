@@ -1,3 +1,30 @@
 <Container>:
+    orientation: "vertical"
+    BoxLayout:
+        TextInput:
+            id: value_input_1
+            font_size: 30
+        TextInput:
+            id: value_input_2
+            font_size: 30
+    BoxLayout:
+        Button:
+            text: "+"
+            on_press: root.on_click_submit_button('+')
+            font_size: 30
+        Button:
+            text: "-"
+            on_press: root.on_click_submit_button('-')
+            font_size: 30
+        Button:
+            text: "*"
+            on_press: root.on_click_submit_button('*')
+            font_size: 30
+        Button:
+            text: "/" 
+            on_press: root.on_click_submit_button('/')
+            font_size: 30
     Label:
+        id: result
         text: "Result: "
+        font_size: 30
