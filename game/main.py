@@ -19,22 +19,29 @@ class Duck(Widget):
 
 
 class DuckGame(Widget):
-    duck = ObjectProperty(None)
+    # duck_1 = ObjectProperty(None)
+    # duck_2 = ObjectProperty(None)
+    # duck_3 = ObjectProperty(None)
+
+    ducks = ReferenceListProperty()
 
     def release_duck(self):
-        self.duck.center = self.center
-        self.duck.velocity = Vector(4, 0).rotate(randint(0, 360))
+        for duck in self.ducks:
+            duck.center = self.center
+            duck.velocity = Vector(4, 0).rotate(randint(0, 360))
 
     def update(self, dt):
-        self.duck.move()
+        for duck in self.ducks:
+            duck.move()
 
-        # bounce off top and bottom
-        if (self.duck.y < 0) or (self.duck.top > self.height):
-            self.duck.velocity_y *= -1
+            # bounce off top and bottom
 
-        # bounce off left and right
-        if (self.duck.x < 0) or (self.duck.right > self.width):
-            self.duck.velocity_x *= -1
+            if (duck.y < 0) or (duck.top > self.height):
+                duck.velocity_y *= -1
+
+            # bounce off left and right
+            if (duck.x < 0) or (duck.right > self.width):
+                duck.velocity_x *= -1
 
 
 class DuckApp(App):
