@@ -19,11 +19,15 @@ class Duck(Widget):
 
 
 class DuckGame(Widget):
-    # duck_1 = ObjectProperty(None)
-    # duck_2 = ObjectProperty(None)
-    # duck_3 = ObjectProperty(None)
-
     ducks = ReferenceListProperty()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        DUCK_NUMBERS = 5
+        for i in range(DUCK_NUMBERS):
+            duck = Duck(center=self.center)
+            self.ducks.append(duck)
+            self.add_widget(duck)
 
     def release_duck(self):
         for duck in self.ducks:
