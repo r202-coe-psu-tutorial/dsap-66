@@ -6,10 +6,22 @@
             size: self.size
             source: 'images/duck.png'
 
+<Gun>:
+    size: 100, 100
+    canvas:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            # source: 'images/duck.png'
+
+
 
 <DuckGame>:
     canvas:
         Rectangle:
-            pos: 0, self.center_y - 20
+            # pos: 0, self.center_y - 20
+            pos: 0, self.top * self.buttom_line_ratio
             size: self.width, 5
+
+
 
