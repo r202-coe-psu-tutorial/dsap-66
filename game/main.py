@@ -44,7 +44,6 @@ class DuckGame(Widget):
 
     def release_duck(self):
         for duck in self.ducks:
-
             print(
                 Window.width,
                 Window.height,
@@ -52,42 +51,35 @@ class DuckGame(Widget):
             )
             duck.center = random.randint(
                 0, Window.width - duck.center_x
-            ), random.randint(self.buttom_line_y + duck.center_y, Window.height)
+            ), random.randint(
+                self.buttom_line_y + 2 * duck.top, Window.height - duck.top
+            )
             print("duck", duck.center)
 
             duck.velocity = Vector(4, 0).rotate(random.randint(0, 360))
 
     def update(self, dt):
-
         self.buttom_line_y = self.top * self.buttom_line_ratio
         for duck in self.ducks:
-            duck.move()
-
-            # bounce off top and bottom
-
-            # if (duck.y < self.center_y) or (duck.top > self.height):
-            # print(duck.top, duck.center)
             if (duck.y < self.buttom_line_y) or (duck.top > self.height):
                 duck.velocity_y *= -1
 
-            # bounce off left and right
             if (duck.x < 0) or (duck.right > self.width):
                 duck.velocity_x *= -1
 
-            for duck2 in self.ducks:
-                if duck == duck2:
+            duck.move()
+
+            for col_duck in self.ducks:
+                if duck == col_duck:
                     continue
 
-                if duck.collide_widget(duck2):
-                    print("col", duck.center, duck2.center)
+                if duck.collide_widget(col_duck):
+                    print("col", duck.center, col_duck.center)
                     duck.velocity_y *= -1
-                    duck2.velocity_y *= -1
+                    col_duck.velocity_y *= -1
                     duck.velocity_x *= -1
-                    duck2.velocity_x *= -1
-            #     # print("duck", duck.y, duck.top, duck.x, duck.right)
-            #     # print("duck2", duck2.y, duck2.top, duck2.x, duck2.right)
-            #     if duck.y < duck2.top or duck.top < duck2.y:
-            #         duck2.velocity_y *= -1
+                    col_duck.velocity_x *= -1
+                    duck.move()
 
 
 class DuckApp(App):
