@@ -1,27 +1,32 @@
 <Duck>:
     size: 100, 100
     canvas:
-        Ellipse:
+        # Ellipse:
+        Rectangle:
             pos: self.pos
             size: self.size
-            source: 'images/duck.png'
+            source: 'images/duck-bg.png'
 
-<Gun>:
+<Shooter>:
     size: 100, 100
     canvas:
         Rectangle:
             pos: self.pos
             size: self.size
-            # source: 'images/duck.png'
+            source: 'images/cannon.png'
 
 
 
 <DuckGame>:
     canvas:
         Rectangle:
-            # pos: 0, self.center_y - 20
             pos: 0, self.top * self.buttom_line_ratio
             size: self.width, 5
+
+
+    Shooter:
+        id: shooter
+        pos: root.center_x - self.center_x, 0
 
 
 
