@@ -12,18 +12,12 @@ import random
 import math
 
 
-class Shooter(Widget):
+class RotatableWidget(Widget):
     mouse_position_x = NumericProperty(0)
     mouse_position_y = NumericProperty(0)
     angle = NumericProperty(90)
 
-    def move(self, mouse_position):
-
-        if (
-            self.mouse_position_x == mouse_position[0]
-            and self.mouse_position_y == mouse_position[1]
-        ):
-            return
+    def get_angle(self, mouse_position):
 
         try:
             angle = math.degrees(
@@ -33,13 +27,26 @@ class Shooter(Widget):
                 )
             )
         except Exception as e:
+            return 0
+
+        if angle > 0:
+            return angle
+
+        return 180 + angle
+
+    def rotate(self, mouse_position):
+
+        if (
+            self.mouse_position_x == mouse_position[0]
+            and self.mouse_position_y == mouse_position[1]
+        ):
             return
 
+        angle = self.get_angle(mouse_position)
         move_angle = 0
         if angle > 0:
             move_angle = angle - self.angle
         else:
-            angle = 180 + angle
             move_angle = angle - self.angle
 
         if angle < 0 or angle > 180:
@@ -58,6 +65,22 @@ class Shooter(Widget):
             PopMatrix()
 
 
+class Shooter(RotatableWidget):
+
+    def move(self, mouse_position):
+        self.rotate(mouse_position)
+
+
+class Bullet(RotatableWidget):
+    velocity_x = NumericProperty(0)
+    velocity_y = NumericProperty(0)
+
+    velocity = ReferenceListProperty(velocity_x, velocity_y)
+
+    def move(self):
+        self.pos = Vector(*self.velocity) + self.pos
+
+
 class Duck(Widget):
     velocity_x = NumericProperty(0)
     velocity_y = NumericProperty(0)
@@ -71,6 +94,7 @@ class Duck(Widget):
 class DuckGame(Widget):
     ducks = ReferenceListProperty()
     buttom_line_ratio = NumericProperty(0.3)
+    bullets = ReferenceListProperty()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -82,12 +106,29 @@ class DuckGame(Widget):
             self.add_widget(duck)
 
         Window.bind(mouse_pos=self.mouse_pos)
+        Window.bind(on_mouse_down=self.on_mouse_down)
 
         self.buttom_line_y = self.top * self.buttom_line_ratio
         self.mouse_position = (0, 0)
 
     def mouse_pos(self, window, pos):
         self.mouse_position = pos
+
+    def on_mouse_down(self, sdl, x, y, button, modifiers):
+        bullet = Bullet(center=(self.ids.shooter.center_x, self.ids.shooter.top))
+
+        bullet.rotate((x, y))
+        angle = bullet.get_angle((x, y))
+        move_angle = 0
+        if angle > 0:
+            move_angle = angle - bullet.angle
+        else:
+            move_angle = angle - bullet.angle
+
+        bullet.velocity = Vector(0, 1).rotate(move_angle)
+
+        self.add_widget(bullet)
+        self.bullets.append(bullet)
 
     def release_duck(self):
         for duck in self.ducks:
@@ -134,6 +175,19 @@ class DuckGame(Widget):
                     duck.move()
 
         self.ids.shooter.move(self.mouse_position)
+        removable_bullets = []
+        for bullet in self.bullets:
+            bullet.move()
+
+            if bullet.right < 0 or bullet.x > self.width:
+                removable_bullets.append(bullet)
+
+            if bullet.y > self.height or bullet.top < 0:
+                removable_bullets.append(bullet)
+
+        for bullet in removable_bullets:
+            self.bullets.remove(bullet)
+            self.remove_widget(bullet)
 
 
 class DuckApp(App):
