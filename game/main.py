@@ -18,34 +18,33 @@ class Shooter(Widget):
     angle = NumericProperty(90)
 
     def move(self, mouse_position):
-        # print(mouse_position, mouse_position[0])
-        # print("center pos", self.center)
-        # print("mouse pos", mouse_position)
-
-        angle = math.degrees(
-            math.atan(
-                (self.center_y - mouse_position[1])
-                / (self.center_x - mouse_position[0])
-            )
-        )
-        # print(mouse_position[1] - self.center_y, mouse_position[0] - self.center_x)
-        # print("angle", angle)
-        # print("x =", self.mouse_position_x, mouse_position[0])
-        # print("y =", self.mouse_position_y, mouse_position[1])
 
         if (
             self.mouse_position_x == mouse_position[0]
             and self.mouse_position_y == mouse_position[1]
         ):
-            # print("no update")
             return
 
-        print("->", self.angle, angle)
+        try:
+            angle = math.degrees(
+                math.atan(
+                    (self.center_y - mouse_position[1])
+                    / (self.center_x - mouse_position[0])
+                )
+            )
+        except Exception as e:
+            return
 
+        move_angle = 0
         if angle > 0:
-            angle = self.angle - angle
+            move_angle = angle - self.angle
+        else:
+            angle = 180 + angle
+            move_angle = angle - self.angle
 
-        print("n ang", angle)
+        if angle < 0 or angle > 180:
+            return
+
         self.angle = angle
 
         self.mouse_position_x = mouse_position[0]
@@ -53,7 +52,7 @@ class Shooter(Widget):
 
         with self.canvas.before:
             PushMatrix()
-            self.rotation = Rotate(angle=angle, origin=self.center)
+            self.rotation = Rotate(angle=move_angle, origin=self.center)
 
         with self.canvas.after:
             PopMatrix()
@@ -88,7 +87,6 @@ class DuckGame(Widget):
         self.mouse_position = (0, 0)
 
     def mouse_pos(self, window, pos):
-        print("mouse 0>", pos)
         self.mouse_position = pos
 
     def release_duck(self):
