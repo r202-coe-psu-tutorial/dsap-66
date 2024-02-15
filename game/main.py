@@ -32,6 +32,7 @@ class DuckGame(Widget):
         DUCK_NUMBERS = 2
         for i in range(DUCK_NUMBERS):
             duck = Duck(center=self.center)
+            duck.velocity = Vector(4, 0).rotate(random.randint(0, 360))
             self.ducks.append(duck)
             self.add_widget(duck)
 
@@ -44,19 +45,14 @@ class DuckGame(Widget):
 
     def release_duck(self):
         for duck in self.ducks:
-            print(
-                Window.width,
-                Window.height,
-                self.buttom_line_y,
+            duck.center = (
+                random.randint(0, Window.width - duck.center_x),
+                random.randint(
+                    self.buttom_line_y + 2 * duck.top, Window.height - duck.top
+                ),
             )
-            duck.center = random.randint(
-                0, Window.width - duck.center_x
-            ), random.randint(
-                self.buttom_line_y + 2 * duck.top, Window.height - duck.top
-            )
-            print("duck", duck.center)
 
-            duck.velocity = Vector(4, 0).rotate(random.randint(0, 360))
+            duck.move()
 
     def update(self, dt):
         self.buttom_line_y = self.top * self.buttom_line_ratio
@@ -74,7 +70,6 @@ class DuckGame(Widget):
                     continue
 
                 if duck.collide_widget(col_duck):
-                    print("col", duck.center, col_duck.center)
                     duck.velocity_y *= -1
                     col_duck.velocity_y *= -1
                     duck.velocity_x *= -1
