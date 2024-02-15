@@ -6,11 +6,57 @@ from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProper
 from kivy.clock import Clock
 from kivy.vector import Vector
 
+from kivy.graphics.context_instructions import PopMatrix, PushMatrix, Transform, Rotate
+
 import random
+import math
 
 
 class Shooter(Widget):
-    pass
+    mouse_position_x = NumericProperty(0)
+    mouse_position_y = NumericProperty(0)
+    angle = NumericProperty(90)
+
+    def move(self, mouse_position):
+        # print(mouse_position, mouse_position[0])
+        # print("center pos", self.center)
+        # print("mouse pos", mouse_position)
+
+        angle = math.degrees(
+            math.atan(
+                (self.center_y - mouse_position[1])
+                / (self.center_x - mouse_position[0])
+            )
+        )
+        # print(mouse_position[1] - self.center_y, mouse_position[0] - self.center_x)
+        # print("angle", angle)
+        # print("x =", self.mouse_position_x, mouse_position[0])
+        # print("y =", self.mouse_position_y, mouse_position[1])
+
+        if (
+            self.mouse_position_x == mouse_position[0]
+            and self.mouse_position_y == mouse_position[1]
+        ):
+            # print("no update")
+            return
+
+        print("->", self.angle, angle)
+
+        if angle > 0:
+            angle = self.angle - angle
+
+        print("n ang", angle)
+        self.angle = angle
+
+        self.mouse_position_x = mouse_position[0]
+        self.mouse_position_y = mouse_position[1]
+
+        with self.canvas.before:
+            PushMatrix()
+            self.rotation = Rotate(angle=angle, origin=self.center)
+
+        with self.canvas.after:
+            PopMatrix()
 
 
 class Duck(Widget):
@@ -36,21 +82,34 @@ class DuckGame(Widget):
             self.ducks.append(duck)
             self.add_widget(duck)
 
-        Window.bind(on_motion=self.on_motion)
+        Window.bind(mouse_pos=self.mouse_pos)
 
         self.buttom_line_y = self.top * self.buttom_line_ratio
+        self.mouse_position = (0, 0)
 
-    def on_motion(self, sdl, type_, event):
-        pass
+    def mouse_pos(self, window, pos):
+        print("mouse 0>", pos)
+        self.mouse_position = pos
 
     def release_duck(self):
         for duck in self.ducks:
-            duck.center = (
+
+            position = (
                 random.randint(0, Window.width - duck.center_x),
                 random.randint(
                     self.buttom_line_y + 2 * duck.top, Window.height - duck.top
                 ),
             )
+            duck.center = position
+
+            for col_duck in self.ducks:
+                if col_duck == duck:
+                    continue
+                if not duck.collide_widget(col_duck):
+                    continue
+
+                while duck.collide_widget(col_duck):
+                    duck.center_x += 2
 
             duck.move()
 
@@ -75,6 +134,8 @@ class DuckGame(Widget):
                     duck.velocity_x *= -1
                     col_duck.velocity_x *= -1
                     duck.move()
+
+        self.ids.shooter.move(self.mouse_position)
 
 
 class DuckApp(App):
